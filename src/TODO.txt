@@ -1,0 +1,7 @@
+Fazer no close de cada nuvem salvar um arquivo texto com
+	ID:
+	Imagens: Array do nome das imagens q apareceu
+	Pontos: Array de XY do seu centroid
+
+Fazer uma tela para configurar o caminho do listenerpath e startar a app (hide no systray).
+
