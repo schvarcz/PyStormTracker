@@ -6,20 +6,10 @@ Created on Jan 6, 2012
 
 from cv2 import *
 import numpy
-import config
+import bin.config
+from bin.banco import Banco
 
 class Nuvem(object):
-    __shape = None
-    contour = None
-    Hits = []
-    ID = None
-    cor = None
-    formacao = []
-    centre = []
-    axes = []
-    angle = []
-    centroid = [] 
-    arquivos = []
     
     def __init__(self):
         self.__shape = None
@@ -30,11 +20,13 @@ class Nuvem(object):
         self.formacao = []
         self.x=0
         self.y=0
+        self.area = 0
         self.centre =[]
         self.axes = []
         self.angle = []
-        self.centroid = [] 
-        self.arquivos = []
+        self.centroid = (None,None) 
+        self.imagems = []
+        self.db = Banco()
     
     
     def getWindowName(self):
@@ -58,25 +50,41 @@ class Nuvem(object):
     def getShape(self):
         return self.__shape
     
-    def updateContour(self,arquivo):
+    def updateContour(self,imagem):
+        if (self.ID == None):
+            self.ID = int(self.db.executeNonQuery("INSERT INTO nuvem VALUES(null)"))
+            for formada in self.formacao:
+                self.db.executeNonQuery("INSERT INTO nuvem_formacao VALUES("+str(self.ID)+","+str(formada)+")")
         if (self.countHits() == 1):
             self.contour = self.Hits[0]
-            self.arquivos = [arquivo]
+            self.imagems = [imagem]
+            self.area = contourArea(self.contour)*16
             m = moments(self.contour)
             if (m['m00'] != 0.0):
-                self.centroid += [(int(m['m10']/m['m00']),int(m['m01']/m['m00']))]
+                self.centroid = (int(m['m10']/m['m00']),int(m['m01']/m['m00']))
             else:
-                self.centroid += [()]
+                self.centroid = (None,None)
             if len(self.contour) >5:
                 centre,axes,angle = fitEllipse(self.contour)
-                self.centre += [centre]
-                self.axes += [axes]
-                self.angle += [angle]
+                self.centre = centre
+                self.axes = axes
+                self.angle = angle
             else:
-                self.centre += [()]
-                self.axes += [()]
-                self.angle += [0]
-            
+                self.centre = (None,None)
+                self.axes = (None,None)
+                self.angle = None
+            self.db.executeNonQuery("INSERT INTO imagem_nuvem VALUES (null,"+
+                               str(imagem)+
+                               ","+str(self.ID)+
+                               ","+str(self.centroid[0] or "null")+
+                               ","+str(self.centroid[1] or "null")+
+                               ","+str(self.centre[0] or "null")+
+                               ","+str(self.centre[1] or "null")+
+                               ","+str(self.angle or "null")+
+                               ","+str(self.axes[0] or "null")+
+                               ","+str(self.axes[1] or "null")+
+                               ","+str(self.area or "null")+
+                               ")")
     def addHit(self,contour):
         self.Hits.append(numpy.copy(contour))
         
@@ -101,12 +109,16 @@ class Nuvem(object):
         else:
             return False
     def __del__(self):
+        pass
+        '''
         arq = open(config.pathImagesSaidaNuvens+str(self.ID)+".txt","w")
         arq.write("Nuvem ID:\t"+str(self.ID)+"\n")
-        arq.write("Imagens:\t"+str(self.arquivos)+"\n")
+        arq.write("Imagens:\t"+str(self.imagems)+"\n")
         arq.write("Formacao:\t"+str(self.formacao)+"\n")
+        arq.write("Area:\t"+str(self.area)+"\n")
         arq.write("Centroid:\t"+str(self.centroid)+"\n")
         arq.write("Centro da elipse:\t"+str(self.centre)+"\n")
         arq.write("Angulo da elipse:\t"+str(self.angle)+"\n")
         arq.write("Eixos da elipse:\t"+str(self.axes)+"\n")
         arq.close()
+        '''

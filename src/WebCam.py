@@ -6,9 +6,8 @@ Created on Jan 5, 2012
 '''
 from cv2 import *
 import numpy
-from Nuvem import *
 from random import *
-from Rastreador import Rastreador
+from bin.Rastreador import Rastreador
 
 def find_connected_comp(mask,poly=1,perimScale=4,num=None,bbs=None,centers=None):
     mask = morphologyEx(mask, MORPH_OPEN , numpy.array(0))

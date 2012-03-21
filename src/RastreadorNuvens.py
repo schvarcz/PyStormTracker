@@ -6,14 +6,14 @@ Created on Jan 25, 2012
 @author: guilherme
 '''
 from os import listdir
-from Interval import Interval
-from Rastreador import Rastreador
-from Imagem import Imagem
 from threading import Thread, Event
 from cv2 import threshold,split,THRESH_BINARY,waitKey,imshow
-from os import rename
+from os import rename, remove
 import time
-import config
+from bin import config
+from bin.Interval import Interval
+from bin.Rastreador import Rastreador
+from bin.Imagem import Imagem
 
 '''
 Podemos transformar isso numa classe
@@ -22,6 +22,9 @@ rastreador = Rastreador()
 UltimasImg = []
 def Reader():
     for arq in listdir(config.pathImagesEntrada):
+        '''
+        TODO: Verificar no banco ao inves da pasta de saida....
+        '''
         if (not (arq in listdir(config.pathImagesSaidaProcessadas))):
             print("Analisando: "+arq)
             starttime = time.clock()
@@ -29,13 +32,14 @@ def Reader():
             img.Carregar()
             binaria = threshold(split(img.data)[0], 180, 255, THRESH_BINARY)[1]
             waitKey(1000)
-            rastreador.updateModel(binaria,arq)
+            rastreador.updateModel(binaria,img.ID)
             rastreador.drawContour(img.data)
             UltimasImg.append(img)
             img.Save(config.pathImagesSaidaProcessadas+arq)
             rename(config.pathImagesEntrada+arq,config.pathImagesSaidaRaw+arq)
             print ("Tempo de analise: "+ str(time.clock() - starttime))
-        
+        else:
+            remove(config.pathImagesEntrada+arq)
 '''
 Só serve para ficar visualizando a imagem na tela
 Na aplicação final, ficará mandando para a viw...

@@ -5,18 +5,16 @@ Created on Jan 22, 2012
 @author: guilherme
 '''
 import numpy
-from Nuvem import Nuvem
+from bin.Nuvem import Nuvem
 from random import randrange
 from cv2 import *
 
 class Rastreador(object):
     contours = []
-    ids = 1
     def __init__(self):
         self.contours = []
-        self.ids = 1
     
-    def updateModel(self,binaria,arquivo):
+    def updateModel(self,binaria,imagem):
         c = findContours(numpy.array(binaria,numpy.uint8), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE)[0]
         for cNew in c:
             hit = []
@@ -29,20 +27,16 @@ class Rastreador(object):
                 #print("Novo!")
                 newNuvem = Nuvem()
                 newNuvem.setShape(binaria.shape)
-                newNuvem.ID = self.ids
                 newNuvem.addHit(cNew)
                 newNuvem.cor = [randrange(0,256),randrange(0,256),randrange(0,256)]
                 self.contours.append(newNuvem)
-                self.ids += 1
             elif nHits > 1:
                 #print("Novo! Agrupar!!")
                 newNuvem = Nuvem()
                 newNuvem.setShape(binaria.shape)
-                newNuvem.ID = self.ids
                 newNuvem.addHit(cNew)
                 newNuvem.cor = [randrange(0,256),randrange(0,256),randrange(0,256)]
                 self.contours.append(newNuvem)
-                self.ids += 1
                 for cOld in hit:
                     cOld.close()
                     newNuvem.formacao.append(cOld.ID)
@@ -58,20 +52,18 @@ class Rastreador(object):
         
         for cOld in self.contours:
             if (cOld.countHits() == 1):
-                cOld.updateContour(arquivo)
+                cOld.updateContour(imagem)
             else:
                 for cNew in cOld.Hits:
                     #print("Novo!")
                     newNuvem = Nuvem()
                     newNuvem.setShape(binaria.shape)
-                    newNuvem.ID = self.ids
                     newNuvem.addHit(cNew)
                     newNuvem.cor = [randrange(0,256),randrange(0,256),randrange(0,256)]
                     newNuvem.formacao.append(cOld.ID)
-                    newNuvem.updateContour(arquivo)
+                    newNuvem.updateContour(imagem)
                     newNuvem.cleanHits()
                     contoursNew.append(newNuvem)
-                    self.ids += 1
                 cOld.close()
                 contoursRemove.append(cOld)
             cOld.cleanHits()
@@ -79,8 +71,6 @@ class Rastreador(object):
         for cOld in contoursRemove:
             self.contours.remove(cOld)
         self.contours += contoursNew
-        if len(self.contours) == 0:
-            self.ids = 1
 
     def drawContour(self,img):
         for c in self.contours:
@@ -91,8 +81,8 @@ class Rastreador(object):
                     ellipse(img, c.centre[-1], c.axes[-1], c.angle[-1], 0, 360, c.cor)
                 '''
                 fillPoly(img, [c.contour], c.cor)
-                if (c.centroid[-1] != ()):
-                    circle(img, c.centroid[-1], 5, [255,255,255],-1)
+                if (c.centroid != (None,None)):
+                    circle(img, c.centroid, 5, [255,255,255],-1)
             else:
                 print("Contour: ")
                 print (c.contour)
