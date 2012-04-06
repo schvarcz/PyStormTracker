@@ -7,7 +7,7 @@ Created on Oct 5, 2011
 from cv2 import *
 from PIL import Image
 import numpy
-from banco import Banco
+from bin.banco import Banco
 
 
 class Imagem(object):
@@ -24,7 +24,7 @@ class Imagem(object):
     def __init__(self,caminho):
         self.Caminho = caminho
         self.db = Banco()
-        self.ID = self.db.executeNonQuery("INSERT INTO imagens VALUES (null,'"+caminho+"',datetime('"+self.caminho2datetime()+"'))")
+        self.ID = self.db.executeNonQuery("INSERT INTO imagens VALUES (null,'"+caminho.split("/")[-1]+"',datetime('"+self.caminho2datetime()+"'))")
     def Open(self,Caminho = None):
         if (not (Caminho is None)):
             self.Caminho = Caminho

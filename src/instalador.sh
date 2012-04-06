@@ -28,9 +28,9 @@ elif [ "$versao" = "oneiric" ]; then
 	sudo apt-get -y remove libcv-dev python-opencv python-numpy > /dev/null
 fi
 
-rm ~/.rastreadorNuvens/ -R
-rm ~/ImagensEntrada/ -R
-rm ~/ImagensSaida/ -R
+rm ~/.rastreadorNuvens/ -R  > /dev/null
+rm ~/ImagensEntrada/ -R  > /dev/null
+rm ~/ImagensSaida/ -R  > /dev/null
 
 echo "Adicionando repositórios..."
 echo " "
