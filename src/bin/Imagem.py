@@ -14,21 +14,24 @@ class Imagem(object):
     Caminho = ""
     DiaJuliano = 0
     Ano = 0
-    Aquisicao = ""  
+    Aquisicao = ""
     Orbita = ""
     Sensor = ""
     Produto = ""
     ResolucaoEspacial = ""
     ResolucaoEspectral = ""
     data = None
-    def __init__(self,caminho):
+
+    def __init__(self, caminho):
         self.Caminho = caminho
         self.db = Banco()
-        self.ID = self.db.executeNonQuery("INSERT INTO imagens VALUES (null,'"+caminho.split("/")[-1]+"',datetime('"+self.caminho2datetime()+"'))")
-    def Open(self,Caminho = None):
+        self.ID = self.db.executeNonQuery("INSERT INTO imagens VALUES (null,'" + caminho.split("/")[-1] + "',datetime('" + self.caminho2datetime() + "'))")
+
+    def Open(self, Caminho=None):
         if (not (Caminho is None)):
             self.Caminho = Caminho
         self.Carregar()
+
     def Carregar(self):
         self.data = imread(self.Caminho)
         if (self.data is None):
@@ -37,26 +40,30 @@ class Imagem(object):
         canais = split(self.data)
         if (len(canais) == 1):
             canais = numpy.array(canais)[0]
-            canais = (canais,canais,canais)
+            canais = (canais, canais, canais)
             self.data = merge(canais)
-    def Save(self,caminho=None):
-        if(caminho != None):
+
+    def Save(self, caminho=None):
+        if(caminho is not None):
             self.Caminho = caminho
         self.Descarregar()
+
     def caminho2datetime(self):
         caminho = self.Caminho.split("/")[-1]
-        return "20"+caminho[:2]+"-"+caminho[2:4]+"-"+caminho[4:6]+" "+caminho[6:8]+":"+caminho[8:10]
+        return "20" + caminho[:2] + "-" + caminho[2:4] + "-" + caminho[4:6] + " " + caminho[6:8] + ":" + caminho[8:10]
+
     def Descarregar(self):
         try:
-            imwrite(self.Caminho,self.data)
+            imwrite(self.Caminho, self.data)
         except:
             img = Image.fromarray(self.data)
             img.save(self.Caminho)
-    def demarcarRoi(self,points):
+
+    def demarcarRoi(self, points):
         pass
-    def recortarImagem(self,points):
+
+    def recortarImagem(self, points):
         pass
+
     def __del__(self):
         pass
-    
-        
