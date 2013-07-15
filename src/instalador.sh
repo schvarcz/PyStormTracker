@@ -2,7 +2,7 @@
 
 versao=`lsb_release -c | awk '{print $2}'`
 
-if [ ! "$versao" = "natty" ] && [ ! "$versao" = "oneiric" ]; then
+if [ ! "$versao" = "natty" ] && [ ! "$versao" = "oneiric" ] && [ ! "$versao" = "quantal" ]; then
 	echo "Desculpe, mas o software não está disponivel para esta versão de SO" 
 	sleep 3
 	exit 1
@@ -24,7 +24,7 @@ fi
 echo "Removendo possiveis versões antigas..."
 if [ "$versao" = "natty" ]; then
 	sudo apt-get -y remove libopencv-dev python-opencv python-numpy > /dev/null
-elif [ "$versao" = "oneiric" ]; then
+else
 	sudo apt-get -y remove libcv-dev python-opencv python-numpy > /dev/null
 fi
 
@@ -44,7 +44,7 @@ sudo apt-get update > /dev/null
 echo "Instalando pré-requisitos..."
 if [ "$versao" = "natty" ]; then
 	sudo apt-get -y install libopencv-dev python-opencv python-numpy > /dev/null
-elif [ "$versao" = "oneiric" ]; then
+else
 	sudo apt-get -y install libcv-dev python-opencv python-numpy > /dev/null
 fi
 
